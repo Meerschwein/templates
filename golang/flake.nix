@@ -10,7 +10,22 @@
     inputs.utils.lib.mkFlake {
       inherit self inputs;
 
-      outputsBuilder = channels: {
+      outputsBuilder = channels: let
+        this-project-app = inputs.utils.lib.mkApp {drv = this-project;};
+        this-project = channels.nixpkgs.buildGoModule {
+          name = "this-project";
+          version = "0.0";
+
+          src = ./.;
+
+          vendorSha256 = "sha256-pQpattmS9VmO3ZIQUFn66az8GSmB4IvYhTTCFn6SUmo=";
+        };
+      in {
+        apps.this-project = this-project-app;
+        apps.default = this-project-app;
+        packages.this-project = this-project;
+        packages.default = this-project;
+
         # run with `nix fmt`
         formatter = channels.nixpkgs.writeShellApplication {
           name = "format";
@@ -20,17 +35,6 @@
             gofumpt
             alejandra
           ];
-        };
-
-        apps.this-project = inputs.utils.lib.mkApp {
-          drv = channels.nixpkgs.buildGoModule {
-            name = "this-project";
-            version = "0.0";
-
-            src = ./.;
-
-            vendorSha256 = "sha256-pQpattmS9VmO3ZIQUFn66az8GSmB4IvYhTTCFn6SUmo=";
-          };
         };
 
         devShells.default = channels.nixpkgs.mkShell {
