@@ -7,6 +7,10 @@
         description = "";
         path = ./golang;
       };
+      basic = {
+        description = "";
+        path = ./basic;
+      };
     };
   };
 }
